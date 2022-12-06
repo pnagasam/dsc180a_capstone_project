@@ -1,0 +1,4 @@
+{
+    "dockerhub-id": "pnagasam/dsc180a_q1proj",
+    "build-script": "python run.py"
+}
