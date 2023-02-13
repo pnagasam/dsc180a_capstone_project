@@ -1,5 +1,4 @@
 # dsc180a_capstone_project
 
-run run.py to:
-    train a RandomForestClassifier on data in country specified in --train-country argument
-    predict the same classifier on data in country specified in --predict-country argument
+run `python3 run.py --test` to test the model on predicting the wealth in urban Angola.
+It will return the model's Mean Square Error or MSE.
