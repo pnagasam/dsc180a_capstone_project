@@ -20,5 +20,7 @@
             "with_OT": true
         }
     },
-    "show_changed": true
+    "show_changed": true,
+    "save_path": "viz/",
+    "random_seed": 53
 }

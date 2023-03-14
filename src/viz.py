@@ -8,7 +8,9 @@ import os
 
 
 def go(dataset, metadata, viz_config, train_config, eval_config, OT_config):
-    
+
+    np.random.seed(viz_config['random_seed'])
+
     def show_channels_id(id, figsize=(30, 15)):
         fig, axs = plt.subplots(2, 4, figsize=figsize)
 

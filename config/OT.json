@@ -1,7 +1,7 @@
 {
-    "target_country": "malawi",
-    "source_country": "benin",
-    "n_samples": 1,
+    "target_country": "nigeria",
+    "source_country": "mali",
+    "n_samples": 500,
     "reg": 0.1,
     "batch_size": 10,
     "save_path": "OT/",
