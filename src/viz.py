@@ -11,7 +11,14 @@ def go(dataset, metadata, viz_config, train_config, eval_config, OT_config):
 
     np.random.seed(viz_config['random_seed'])
 
-    def show_channels_id(id, figsize=(30, 15)):
+    path = viz_config['save_path']
+
+    try:
+        os.makedirs(path)
+    except FileExistsError:
+        pass
+
+    def show_channels_id(id, filename, figsize=(20, 10)):
         fig, axs = plt.subplots(2, 4, figsize=figsize)
 
         channels = ['BLUE', 'GREEN', 'RED', 'SWIR1', 'SWIR2', 'TEMP1', 'NIR', 'NIGHTLIGHTS']
@@ -20,9 +27,12 @@ def go(dataset, metadata, viz_config, train_config, eval_config, OT_config):
             axs[i//4][i%4].imshow(dataset[id][0][i])
             axs[i//4][i%4].set_title(channels[i])
 
-        print(f'wealth index: {dataset[id][1][0]}')
+        fig.suptitle(f"{viz_config['source_country']}; no OT; wealth index: {dataset[id][1][0]:03f}", fontsize='25')
 
-    def show_channels_im(im, figsize=(30, 15)):
+        fig.show()
+        fig.savefig(os.path.join(path, f"{filename}.png"))
+
+    def show_channels_im(im, filename, figsize=(20, 10)):
         fig, axs = plt.subplots(2, 4, figsize=figsize)
 
         channels = ['BLUE', 'GREEN', 'RED', 'SWIR1', 'SWIR2', 'TEMP1', 'NIR', 'NIGHTLIGHTS']
@@ -30,33 +40,44 @@ def go(dataset, metadata, viz_config, train_config, eval_config, OT_config):
         for i in range(8):
             axs[i//4][i%4].imshow(im[0][i])
             axs[i//4][i%4].set_title(channels[i])
-            
-    def show_image(id, title=None):
-        # definitely not accurate...
-        plt.imshow((torch.stack([dataset[id][0][2], dataset[id][0][1], dataset[id][0][0]], dim=2)+1.2290)/(2.6758+1.2290))
-        plt.title(title)
 
-        print(f'wealth index: {dataset[id][1][0]}')
+        fig.suptitle(f"{viz_config['source_country']}; OT to {viz_config['target_country']}", fontsize='25')
         
+        fig.show()
+        fig.savefig(os.path.join(path, f"{filename}.png"))
+
+    def show_image_id(id, title):
+        # definitely not accurate...
+        fig, ax = plt.subplots(1, 1, figsize=(6, 6.5))
+
+        ax.imshow((torch.stack([dataset[id][0][2], dataset[id][0][1], dataset[id][0][0]], dim=2)+1.2290)/(2.6758+1.2290))
+        ax.set_title(f"{title};\nwealth index: {dataset[id][1][0]:03f}")
+
+        fig.show()
+        fig.savefig(os.path.join(path, f"{title}.png"))
+        
+    def show_image_im(im, title):
+
+        fig, ax = plt.subplots(1, 1, figsize=(6, 6))
+        ax.imshow((torch.stack([im[0][2], im[0][1], im[0][0]], dim=2)+1.2290)/(2.6758+1.2290))
+        ax.set_title(title)
+
+        fig.show()
+        fig.savefig(os.path.join(path, f"{title}.png"))
+
     def compare_ot_and_not(imid, sinkhorn):
 
         #print("Transporting image...")
         im = dataset[imid][0][None, :, :, :].clone()
         transport_images(im, sinkhorn)
+        
+        show_image_im(im, f"RGB_{viz_config['source_country']}_{imid}_OT_to_{viz_config['target_country']}")
 
-        print("OT")
-        plt.imshow((torch.stack([im[0][2], im[0][1], im[0][0]], dim=2)+1.2290)/(2.6758+1.2290))
-        plt.title("RGB")
-        plt.show()
-        print("no OT")
-        show_image(imid, title="RGB")
-        plt.show()
-        print("OT")
-        show_channels_im(im)
-        plt.show()
-        print("no OT")
-        show_channels_id(imid)
-        plt.show()
+        show_image_id(imid, f"RGB_{viz_config['source_country']}_{imid}_no_OT")
+
+        show_channels_im(im, f"8ch_{viz_config['source_country']}_{imid}_OT_to_{viz_config['target_country']}")
+
+        show_channels_id(imid, f"8ch_{viz_config['source_country']}_{imid}_no_OT")
     
     plt.rcParams.update({'font.size': 15})
     
@@ -73,6 +94,7 @@ def go(dataset, metadata, viz_config, train_config, eval_config, OT_config):
         ax.set_xlabel('Asset index')
         ax.set_ylabel('Count')
         ax.set_title('Distribution of Asset Index')
+        fig.savefig(os.path.join(path, 'asset_index_distribution.png'))
         fig.show()
     
     
@@ -124,28 +146,36 @@ def go(dataset, metadata, viz_config, train_config, eval_config, OT_config):
         axs[1].set_xlabel("Asset index")
         axs[0].set_xlabel("Asset index")
 
-        fig.suptitle("Classification Cutoffs", fontsize='25')
+        fig.suptitle(f"{viz_config['target_country']} classification cutoffs", fontsize='25')
+        fig.savefig(os.path.join(path, f"{viz_config['target_country']}_clf_cutoffs.png"))
         fig.show()
         
     if viz_config['training_info']['urban']:
+        fig, ax = plt.subplots(1, 1, figsize=(8, 6))
         t = pd.read_csv(os.path.join(
             train_config['save_path'],
             viz_config['target_country'],
             'urban',
             'training_info.csv'
-        ))
-        t.iloc[:t['valid_loss'].idxmin()].plot(figsize=(6.5, 4.5), xlabel='epoch', title=f"{viz_config['target_country']} urban training info")
+        ), index_col=0)
+        t.iloc[:t['valid_loss'].idxmin()].plot(ax=ax, xlabel='epoch', title=f"{viz_config['target_country']} urban training info")
+        fig.show()
+        fig.savefig(os.path.join(path, f"{viz_config['target_country']}_urban_training_info.png"))
         
+
     if viz_config['training_info']['rural']:
+        fig, ax = plt.subplots(1, 1, figsize=(8, 6))
         t = pd.read_csv(os.path.join(
             train_config['save_path'],
             viz_config['target_country'],
             'rural',
             'training_info.csv'
-        ))
-        t.iloc[:t['valid_loss'].idxmin()].plot(figsize=(6.5, 4.5), xlabel='epoch', title=f"{viz_config['target_country']} rural training info")
+        ), index_col=0)
+        t.iloc[:t['valid_loss'].idxmin()].plot(ax=ax, xlabel='epoch', title=f"{viz_config['target_country']} rural training info")
+        fig.show()
+        fig.savefig(os.path.join(path, f"{viz_config['target_country']}_rural_training_info.png"))
         
-        
+
     if viz_config['source_confusion_matrix']['urban']['without_OT']:
         df = pd.read_csv(os.path.join(
             eval_config['save_path'],
@@ -160,6 +190,7 @@ def go(dataset, metadata, viz_config, train_config, eval_config, OT_config):
         print(p.head())
         print()
         
+
     if viz_config['source_confusion_matrix']['urban']['with_OT']:
         df = pd.read_csv(os.path.join(
             eval_config['save_path'],
@@ -174,6 +205,7 @@ def go(dataset, metadata, viz_config, train_config, eval_config, OT_config):
         print(p.head())
         print()
         
+
     if viz_config['source_confusion_matrix']['rural']['without_OT']:
         df = pd.read_csv(os.path.join(
             eval_config['save_path'],
@@ -188,6 +220,7 @@ def go(dataset, metadata, viz_config, train_config, eval_config, OT_config):
         print(p.head())
         print()
         
+
     if viz_config['source_confusion_matrix']['rural']['with_OT']:
         df = pd.read_csv(os.path.join(
             eval_config['save_path'],
@@ -218,7 +251,6 @@ def go(dataset, metadata, viz_config, train_config, eval_config, OT_config):
         df = df.replace([2, 1, 0], ["poor", 'moderate', 'wealthy'])
         df = df.pivot_table(index='id', columns='transport', values=['predicted', 'actual'], aggfunc=sum)
         df = df[df['predicted'][False] != df['predicted'][True]]
-        a = df['actual'][False]
         p = pd.DataFrame({
             'actual': df['actual'][False],
             'without_OT': df['predicted'][False],
@@ -226,8 +258,10 @@ def go(dataset, metadata, viz_config, train_config, eval_config, OT_config):
         })
 
         s = p.sample()
-        print(s.head())
-        imid = s.index.values[0]
         
+        imid = s.index.values[0]
+        print(s.head())
+
         compare_ot_and_not(imid, ot_sinkhorn)
         
+    plt.show()

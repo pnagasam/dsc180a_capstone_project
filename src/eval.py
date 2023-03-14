@@ -196,10 +196,16 @@ def go(dataset, metadata, eval_config, train_config, OT_config):
         else:
             print("Please set either urban or rural to true in config/eval.json")
             
-    transport_results.to_csv(
-        os.path.join(
-            eval_config['save_path'],
-            f"{eval_config['source_country']}_to_{eval_config['target_country']}.csv")
-    )
-    print('Results Saved.')
+
+    try:
+         os.makedirs(eval_config['save_path'])
+    except FileExistsError:
+         pass
+    finally:
+        transport_results.to_csv(
+            os.path.join(
+                eval_config['save_path'],
+                f"{eval_config['source_country']}_to_{eval_config['target_country']}.csv")
+        )
+        print('Results Saved.')
     

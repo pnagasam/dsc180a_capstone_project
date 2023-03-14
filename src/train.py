@@ -74,6 +74,7 @@ def train_model(dataset, train_ids, valid_ids, n_epochs, batch_size, low_cutoff,
 
         # put NN on GPU
         if torch.cuda.is_available():
+            print("CUDA Available!")
             net = net.cuda()
 
 
@@ -158,7 +159,9 @@ def train_model(dataset, train_ids, valid_ids, n_epochs, batch_size, low_cutoff,
             if epoch > 10:
                 if training_info['train_acc'].iloc[-1] < .9:
                     if training_info['train_loss'].iloc[-10:].round(4).nunique() == 1:
-                        net = Net()                                                    # re init weights
+                        net = Net()  # re init weights
+                        if torch.cuda.is_available():
+                            net = net.cuda()
                         optimizer = optim.AdamW(net.parameters())
                         
                         

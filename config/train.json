@@ -6,8 +6,8 @@
     "rural": true,
     "low_quantile": 0.3333333,
     "high_quantile": 0.6666666,
-    "n_epochs": 1,
+    "n_epochs": 300,
     "batch_size": 48,
     "save_path": "models/",
-    "random_seed": 42
+    "random_seed": 10
 }
