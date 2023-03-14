@@ -1,0 +1,9 @@
+{
+    "target_country": "nigeria",
+    "source_country": "mali",
+    "urban": true,
+    "rural": true,
+    "batch_size": 10,
+    "save_path": "results/",
+    "random_seed": 76
+}

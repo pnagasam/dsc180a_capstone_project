@@ -1,0 +1,9 @@
+{
+    "target_country": "malawi",
+    "source_country": "benin",
+    "n_samples": 1,
+    "reg": 0.1,
+    "batch_size": 10,
+    "save_path": "OT/",
+    "random_seed": 10
+}

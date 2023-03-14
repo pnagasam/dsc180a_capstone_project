@@ -1,30 +1,82 @@
-import sys
+import os
 import argparse
-#from src.models.train_model import train_model
-#from src.models.predict_model import predict_model
-from src.models.train import predict_model
-from os.path import join, abspath
-
-sys.path.insert(0,'src')
+import json
+import src.data as data
+import src.train as train
+import src.OT as OT
+import src.eval as _eval
+import src.viz as viz
 
 def main(args):
-    fp_test = join(abspath(join(__file__, "..")),"test/")
-    fp_meta = join(fp_test, "dhs_metadata.csv")
-    fp_ims = join(fp_test, "images/")
-    #clf, train_hists = train_model(args.train_country)
-    #predict_model(clf, args.predict_country, train_hists)
-    predict_model(fp_ims, fp_meta)
+    
+    
+    if args.exec_type in ['data', 'train', 'OT', 'eval', 'viz', 'all']:
+        
+        print('Loading Data...')
+        
+        dataset, metadata = data.load_dataset()
+        
+        print('Data Loaded.')
+    
+    if args.exec_type in ['train', 'all']:
+        
+        train_config = json.load(open('config/train.json'))
+        
+        fmt = lambda x: 'X' if x else ' '
+        print(f"Training Model(s)...     [{train_config['country']}: urban ({fmt(train_config['urban'])}), rural ({fmt(train_config['rural'])})]")
+        
+        train.go(dataset, metadata, train_config)
+        
+        print('Finished Training.')
+            
+    if args.exec_type in ['OT', 'all']:
+        
+        OT_config = json.load(open('config/OT.json'))
+        
+        print(f"Computing OT...     [{OT_config['source_country']} -> {OT_config['target_country']}]")
+        
+        OT.go(dataset, metadata, OT_config)
+        
+        print('Finished OT.')
+        
+    if args.exec_type in ['eval', 'all']:
+        
+        
+        
+        eval_config = json.load(open('config/eval.json'))
+        
+        train_config = json.load(open('config/train.json'))
+        
+        OT_config = json.load(open('config/OT.json'))
+        
+        fmt = lambda x: 'X' if x else ' '
+        print(f"Evaluating Model(s)...     [{eval_config['source_country']} -> {eval_config['target_country']}: urban ({fmt(eval_config['urban'])}), rural ({fmt(eval_config['rural'])})]")
+        
+        _eval.go(dataset, metadata, eval_config, train_config, OT_config)
+        
+        print('Finished Evaluating.')
+        
+    if args.exec_type in ['viz', 'all']:
+        
+        viz_config = json.load(open('config/viz.json'))
+        
+        eval_config = json.load(open('config/eval.json'))
+        
+        train_config = json.load(open('config/train.json'))
+        
+        OT_config = json.load(open('config/OT.json'))
+        
+        print(f"Beginning Visualization Script...     [{viz_config['source_country']} -> {viz_config['target_country']}]")
+        
+        viz.go(dataset, metadata, viz_config, train_config, eval_config, OT_config)
+        
+        
     
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
 
-    #parser.add_argument("--train-country", default='angola', type=str, 
-    #            help="The country to train the model on.")
-    #parser.add_argument("--predict-country", default='benin', type=str,
-    #            help="The country to predict the model on.")
-    parser.add_argument("--test", action="store_true",
-                help="Runs test script on the program.")
+    parser.add_argument("exec_type")
     
     args = parser.parse_args()
 

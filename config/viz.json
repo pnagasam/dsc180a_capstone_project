@@ -1,0 +1,24 @@
+{
+    "asset_index_dist": true,
+    "clf_cutoffs": true,
+    "target_country": "nigeria",
+    "source_country": "mali",
+    "low_quantile": 0.33333,
+    "high_quantile": 0.66666,
+    "training_info": {
+        "urban": true,
+        "rural": true
+    },
+    "source_confusion_matrix": {
+        "urban": {
+            "without_OT": true,
+            "with_OT": true
+            
+        },
+        "rural": {
+            "without_OT": true,
+            "with_OT": true
+        }
+    },
+    "show_changed": true
+}
