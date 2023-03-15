@@ -17,8 +17,7 @@ viz      # for creating visualizations
 
 all      # for doing all of the above
 
-test     # for testing all of the above
-         # funcitonality on dummy data
+test     # for testing all of the above on dummy data
          # (except downloading the data)
 ```
 
@@ -52,7 +51,7 @@ The model we used for this project was a custom CNN built in pytorch and trained
 ```
 python3 run.py train
 ```
-To change which country the model should be trained on, whether an urban/rural model should be trained, the percentile cutoffs the model uses for classification, or other training parameters, please consult `config/train.json`.
+To change which country the model should be trained on, whether an urban/rural model should be trained, the percentile cutoffs the model uses for classification, or other training parameters, please consult the config section below.
 
 To remove all trained models, run:
 ```
@@ -107,4 +106,88 @@ python3 run.py test -c    # or --clean
 Running `python3 run.py test -c    # or --clean` won't remove anything. To remove all saved objects, run:
 ```
 python3 run.py all -c    # or --clean
+```
+
+## Config
+Below is the default `config/` files along with descriptions of each option.
+
+### Train
+`config/train.json`
+
+```json
+{
+    "country": "nigeria",  // the country to train the model on (usually same as "target_country")
+    "train_proportion": 0.7,  // proportion of data to use to train the model
+    "valid_proportion": 0.2,   // proportion of data to use to validate the model
+    "urban": true,  // whether to train a model on urban data
+    "rural": true,  // whether to train a rural on urban data
+    "low_quantile": 0.3333333,  // the lower percentile used for classification cutoff
+    "high_quantile": 0.6666666,  // the lower percentile used for classification cutoff
+    "n_epochs": 300,   // number of epochs to train the model on (best one will be used for evaluation)
+    "batch_size": 48,  // batch size to use
+    "save_path": "models/",  // path to save models at
+    "random_seed": 10  // random seed to use for training
+}
+```
+
+### OT
+`config/OT.json`
+
+```json
+{
+    "target_country": "nigeria",  // country to transport to
+    "source_country": "mali",  // country to transport from
+    "n_samples": 500,  // number of pixel samples to take from each country
+    "reg": 0.1,  // sinkhorn's regularization parameter
+    "batch_size": 10,  // batch size to use for OT
+    "save_path": "OT/",  // path to save OT objects to
+    "random_seed": 10  // random seed to use for OT
+}
+```
+
+### Results
+`config/eval.json`
+
+```json
+{
+    "target_country": "nigeria", // OT "target_country" (usually the same as "country" in config/train.json)
+    "source_country": "mali",  // OT "source_country"
+    "urban": true,  // whether to evaluate results on urban model
+    "rural": true,  // whether to evaluate results on rural model
+    "batch_size": 10,  // batch size to use when evaluating
+    "save_path": "results/",  // path to save results at
+    "random_seed": 76  // random seed to use for evaluation
+}
+```
+
+### Visualizations
+`config/viz.json`
+
+```json
+{
+    "asset_index_dist": true,  // whether to show asset index distribution visualization
+    "clf_cutoffs": true,  // whether to show classification cutoff visualization
+    "target_country": "nigeria",  // OT "target_country" and train "country"
+    "source_country": "mali",  // OT "source_country"
+    "low_quantile": 0.33333,  // the lower percentile used for classification cutoff
+    "high_quantile": 0.66666,  // the lower percentile used for classification cutoff
+    "training_info": {
+        "urban": true,  // whether to show training info for urban model
+        "rural": true  // whether to show training info for rural model
+    },
+    "source_confusion_matrix": {
+        "urban": {
+            "without_OT": true,  // whether to show confusion matrix for urban model without OT
+            "with_OT": true  // whether to show confusion matrix for urban model with OT
+            
+        },
+        "rural": {
+            "without_OT": true,  // whether to show confusion matrix for rural model without OT
+            "with_OT": true  // whether to show confusion matrix for rural model with OT
+        }
+    },
+    "show_changed": true,  // whether to an example of where optimal transport changed the models prediction
+    "save_path": "viz/", // path to save visualizations to
+    "random_seed": 53 // random seed to use for visualizations
+}
 ```
