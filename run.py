@@ -1,3 +1,4 @@
+print('Started.')
 import os
 import shutil
 import argparse
@@ -7,9 +8,11 @@ import src.train as train
 import src.OT as OT
 import src.eval as _eval
 import src.viz as viz
+print('Finished Initial Imports.')
+
+DUMMY_SIZE = 1000
 
 def main(args):
-    
     
     if args.exec_type in ['data', 'train', 'OT', 'eval', 'viz', 'all']:
         
@@ -22,12 +25,24 @@ def main(args):
             dataset, metadata = data.load_dataset()
             
             print('Data Loaded.')
+
+    if args.exec_type in ['test']:
+
+        if args.clean:
+            print('--clean argument recieved for testing purposes. Exiting...')
+
+        else:
+            print("Generating Dummy Data...")
+
+            dataset, metadata = data.generate_dummmy_data(DUMMY_SIZE)
+
+            print("Done.")
         
-    if args.exec_type in ['train', 'all']:
+    if args.exec_type in ['train', 'all', 'test']:
             
         train_config = json.load(open('config/train.json'))
         
-        if args.clean:
+        if args.clean and args.exec_type != 'test':
 
             print("Cleaning Models...")
             shutil.rmtree(os.path(OT_config['save_path']))
@@ -40,11 +55,11 @@ def main(args):
             
             print('Finished Training.')
             
-    if args.exec_type in ['OT', 'all']:
+    if args.exec_type in ['OT', 'all', 'test']:
         
         OT_config = json.load(open('config/OT.json'))
 
-        if args.clean:
+        if args.clean and args.exec_type != 'test':
 
             print("Cleaning OT...")
             shutil.rmtree(os.path(OT_config['save_path']))
@@ -56,11 +71,11 @@ def main(args):
             
             print('Finished OT.')
         
-    if args.exec_type in ['eval', 'all']:
+    if args.exec_type in ['eval', 'all', 'test']:
 
         eval_config = json.load(open('config/eval.json'))
 
-        if args.clean:
+        if args.clean and args.exec_type != 'test':
 
             print("Cleaning Results...")
             shutil.rmtree(os.path(eval_config['save_path']))
@@ -77,11 +92,11 @@ def main(args):
             
             print('Finished Evaluating.')
         
-    if args.exec_type in ['viz', 'all']:
+    if args.exec_type in ['viz', 'all', 'test']:
         
         viz_config = json.load(open('config/viz.json'))
 
-        if args.clean:
+        if args.clean and args.exec_type != 'test':
             print("Cleaning Visualizations...")
             shutil.rmtree(os.path.join(viz_config['save_path']))
         else:

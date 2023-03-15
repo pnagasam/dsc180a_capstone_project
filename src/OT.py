@@ -4,7 +4,7 @@ import torch
 import math
 import numpy as np
 
-from src.data import dataIterable, get_ids
+from src.data import dataIterable
 
 
 
@@ -29,7 +29,6 @@ def get_pixel_sample(data_iterable, n_samples):
     # remove extra samples
     ids = np.random.randint(low=0, high=samples.shape[1], size=n_samples)
     samples = samples[:, ids]
-        
     return samples
 
 
@@ -60,22 +59,30 @@ def load_sinkhorn(path, sinkhorn_reg):
 
 def go(dataset, metadata, OT_config):
     
-    np.random.seed(OT_config['random_seed'])
-    
-    S = metadata[metadata['country'] == OT_config['source_country']]
-    T = metadata[metadata['country'] == OT_config['target_country']]
-    
-    S_i = S.index.values
-    T_i = T.index.values
-    
-    Xs = get_pixel_sample(dataIterable(dataset, S_i, OT_config['batch_size']), OT_config['n_samples']).T
-    Xt = get_pixel_sample(dataIterable(dataset, T_i, OT_config['batch_size']), OT_config['n_samples']).T
-    
-    ot_sinkhorn = ot.da.SinkhornTransport(reg_e=OT_config['reg'])
-    ot_sinkhorn.fit(Xs=Xs, Xt=Xt)
-    
-    save_sinkhorn(
-        ot_sinkhorn,
-        os.path.join(OT_config['save_path'], f"{OT_config['source_country']}_to_{OT_config['target_country']}")
-    )
-    
+    try:
+        load_sinkhorn(
+            os.path.join(OT_config['save_path'], f"{OT_config['source_country']}_to_{OT_config['target_country']}"),
+            OT_config['reg']
+        )
+        print("Using Existing Transport.")
+    except FileNotFoundError:
+
+        np.random.seed(OT_config['random_seed'])
+        
+        S = metadata[metadata['country'] == OT_config['source_country']]
+        T = metadata[metadata['country'] == OT_config['target_country']]
+        
+        S_i = S.index.values
+        T_i = T.index.values
+        
+        Xs = get_pixel_sample(dataIterable(dataset, S_i, OT_config['batch_size']), OT_config['n_samples']).T
+        Xt = get_pixel_sample(dataIterable(dataset, T_i, OT_config['batch_size']), OT_config['n_samples']).T
+        
+        ot_sinkhorn = ot.da.SinkhornTransport(reg_e=OT_config['reg'])
+        ot_sinkhorn.fit(Xs=Xs, Xt=Xt)
+        
+        save_sinkhorn(
+            ot_sinkhorn,
+            os.path.join(OT_config['save_path'], f"{OT_config['source_country']}_to_{OT_config['target_country']}")
+        )
+        
