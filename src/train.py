@@ -188,7 +188,7 @@ def go(dataset, metadata, train_config):
     np.random.seed(train_config['random_seed'])
 
     if train_config['urban']:
-
+        print(f"Preparing Urban Data for {train_config['country']}...")
 
         T_u_i_train, T_u_i_valid, T_u_i_test = tvt_split_index(
             get_ids(metadata, train_config['country'], urban=True),
@@ -216,6 +216,7 @@ def go(dataset, metadata, train_config):
         )
 
     if train_config['rural']:
+        print(f"Preparing Rural Data for {train_config['country']}...")
 
         T_r_i_train, T_r_i_valid, T_r_i_test = tvt_split_index(
             get_ids(metadata, train_config['country'], urban=False),

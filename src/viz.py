@@ -183,9 +183,17 @@ def go(dataset, metadata, viz_config, train_config, eval_config, OT_config):
         ))
         r = df[df['urban'] == True]
         t = r[r['transport'] == False]
-        t = t.replace([2, 1, 0], ["poor", 'moderate', 'wealthy'])
+
+        # pivot table
         p = t.pivot_table(index='predicted', columns='actual', values='urban', aggfunc='count')
-        p = p.fillna(0).astype(int).loc[['wealthy', 'moderate', 'poor']][['wealthy', 'moderate', 'poor']]
+        
+        # rename axes
+        p = p.rename(
+            index={0: 'wealthy', 1: 'moderate', 2: 'poor'},
+            columns={0: 'wealthy', 1: 'moderate', 2: 'poor'}
+        )
+
+        p = p.fillna(0).astype(int)
         print("Confusion matrix of source domain (urban, without OT):")
         print(p.head())
         print()
@@ -198,9 +206,17 @@ def go(dataset, metadata, viz_config, train_config, eval_config, OT_config):
         ))
         r = df[df['urban'] == True]
         t = r[r['transport'] == True]
-        t = t.replace([2, 1, 0], ["poor", 'moderate', 'wealthy'])
+        
+        # pivot table
         p = t.pivot_table(index='predicted', columns='actual', values='urban', aggfunc='count')
-        p = p.fillna(0).astype(int).loc[['wealthy', 'moderate', 'poor']][['wealthy', 'moderate', 'poor']]
+
+        # rename axes
+        p = p.rename(
+            index={0: 'wealthy', 1: 'moderate', 2: 'poor'},
+            columns={0: 'wealthy', 1: 'moderate', 2: 'poor'}
+        )
+
+        p = p.fillna(0).astype(int)
         print("Confusion matrix of source domain (urban, with OT):")
         print(p.head())
         print()
@@ -213,9 +229,17 @@ def go(dataset, metadata, viz_config, train_config, eval_config, OT_config):
         ))
         r = df[df['urban'] == False]
         t = r[r['transport'] == False]
-        t = t.replace([2, 1, 0], ["poor", 'moderate', 'wealthy'])
+        
+        # pivot table
         p = t.pivot_table(index='predicted', columns='actual', values='urban', aggfunc='count')
-        p = p.fillna(0).astype(int).loc[['wealthy', 'moderate', 'poor']][['wealthy', 'moderate', 'poor']]
+
+        # rename axes
+        p = p.rename(
+            index={0: 'wealthy', 1: 'moderate', 2: 'poor'},
+            columns={0: 'wealthy', 1: 'moderate', 2: 'poor'}
+        )
+
+        p = p.fillna(0).astype(int)
         print("Confusion matrix of source domain (rural, without OT):")
         print(p.head())
         print()
@@ -228,9 +252,17 @@ def go(dataset, metadata, viz_config, train_config, eval_config, OT_config):
         ))
         r = df[df['urban'] == False]
         t = r[r['transport'] == True]
-        t = t.replace([2, 1, 0], ["poor", 'moderate', 'wealthy'])
+        
+        # pivot table
         p = t.pivot_table(index='predicted', columns='actual', values='urban', aggfunc='count')
-        p = p.fillna(0).astype(int).loc[['wealthy', 'moderate', 'poor']][['wealthy', 'moderate', 'poor']]
+
+        # rename axes
+        p = p.rename(
+            index={0: 'wealthy', 1: 'moderate', 2: 'poor'},
+            columns={0: 'wealthy', 1: 'moderate', 2: 'poor'}
+        )
+
+        p = p.fillna(0).astype(int)
         print("Confusion matrix of source domain (rural, with OT):")
         print(p.head())
         print()
@@ -257,11 +289,15 @@ def go(dataset, metadata, viz_config, train_config, eval_config, OT_config):
             'with_OT': df['predicted'][True]
         })
 
-        s = p.sample()
-        
-        imid = s.index.values[0]
-        print(s.head())
+        if p.index.size > 0:
 
-        compare_ot_and_not(imid, ot_sinkhorn)
+            s = p.sample()
+            
+            imid = s.index.values[0]
+            print(s.head())
+
+            compare_ot_and_not(imid, ot_sinkhorn)
+        else:
+            print("Applying OT didn't change any predictions.")
         
     plt.show()

@@ -1,4 +1,3 @@
-print('Started.')
 import os
 import shutil
 import argparse
@@ -8,7 +7,6 @@ import src.train as train
 import src.OT as OT
 import src.eval as _eval
 import src.viz as viz
-print('Finished Initial Imports.')
 
 DUMMY_SIZE = 1000
 
@@ -46,7 +44,10 @@ def main(args):
         if args.clean:
 
             print("Cleaning Models...")
-            shutil.rmtree(os.path.join(train_config['save_path']))
+            try:
+                shutil.rmtree(os.path.join(train_config['save_path']))
+            except FileNotFoundError:
+                print("No Models Found.")
         else:
 
             fmt = lambda x: 'X' if x else ' '
@@ -63,7 +64,10 @@ def main(args):
         if args.clean:
 
             print("Cleaning OT...")
-            shutil.rmtree(os.path.join(OT_config['save_path']))
+            try:
+                shutil.rmtree(os.path.join(OT_config['save_path']))
+            except FileNotFoundError:
+                print("No OT Found.")
         else:
         
             print(f"Computing OT...     [{OT_config['source_country']} -> {OT_config['target_country']}]")
@@ -79,7 +83,10 @@ def main(args):
         if args.clean:
 
             print("Cleaning Results...")
-            shutil.rmtree(os.path.join(eval_config['save_path']))
+            try:
+                shutil.rmtree(os.path.join(eval_config['save_path']))
+            except FileNotFoundError:
+                print("No Results Found.")
         else:
         
             train_config = json.load(open('config/train.json'))
@@ -99,7 +106,10 @@ def main(args):
 
         if args.clean:
             print("Cleaning Visualizations...")
-            shutil.rmtree(os.path.join(viz_config['save_path']))
+            try:
+                shutil.rmtree(os.path.join(viz_config['save_path']))
+            except FileNotFoundError:
+                print("No Visualizations Found.")
         else:
             
             eval_config = json.load(open('config/eval.json'))

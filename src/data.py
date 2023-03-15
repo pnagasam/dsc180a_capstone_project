@@ -1,6 +1,5 @@
 from wilds import get_dataset
 import pandas as pd
-import os
 import numpy as np
 import torch
 
