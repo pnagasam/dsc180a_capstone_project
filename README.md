@@ -4,7 +4,26 @@ This program takes care of all model data loading preprocessing, model building 
 
 ## Usage
 
-All functionality 
+All functionality is used by running `python3 run.py` followed by some arguments in the root directory. The first argument is `exec_type` which indicates what action you would like to take. Possible values are:
+```
+data     # for data loading
+
+train    # for model training
+
+OT       # for optimal transport
+
+eval     # for gathering results
+
+viz      # for creating visualizations
+
+all      # for doing all of the above
+
+test     # for testing all of the above
+         # funcitonality on dummy data
+         # (except downloading the data)
+```
+
+The second and final argument is `-c` or `--clean`, which, when included cleans the save directories used by the specified `exec_type`.
 
 ### Data Loading
 
@@ -26,7 +45,7 @@ python3 run.py train
 ```
 To change which country the model should be trained on, whether an urban/rural model should be trained, the percentile cutoffs the model uses for classification, or other training parameters, please consult `config/train.json`.
 
-To clean all trained models, run:
+To remove all trained models, run:
 ```
 python3 run.py train --clean
 ```
@@ -48,7 +67,7 @@ In order to fit the optimal transport to transport images from a source country 
 python3 run.py OT
 ```
 
-To clean all saved OT models, run:
+To remove all saved OT models, run:
 ```
 python3 run.py OT --clean
 ```
@@ -59,4 +78,17 @@ python3 run.py OT -c
 
 ### Results
 
+The results are gathered and displayed using data, models and OT objects saved from above. This function will error if run without running `data`, `train`, and `OT` first with aligning configuration to generate objects. To run:
+```
+python3 run.py eval
+```
+
+To remove all saved results, run:
+```
+python3 run.py eval -c # or --clean
+```
+or
+```
+python3 run.py eval -c
+```
 ### Visulisations
