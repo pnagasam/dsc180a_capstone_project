@@ -30,6 +30,7 @@ def main(args):
 
         if args.clean:
             print('--clean argument recieved for testing purposes. Exiting...')
+            quit()
 
         else:
             print("Generating Dummy Data...")
@@ -42,10 +43,10 @@ def main(args):
             
         train_config = json.load(open('config/train.json'))
         
-        if args.clean and args.exec_type != 'test':
+        if args.clean:
 
             print("Cleaning Models...")
-            shutil.rmtree(os.path(OT_config['save_path']))
+            shutil.rmtree(os.path.join(train_config['save_path']))
         else:
 
             fmt = lambda x: 'X' if x else ' '
@@ -59,10 +60,10 @@ def main(args):
         
         OT_config = json.load(open('config/OT.json'))
 
-        if args.clean and args.exec_type != 'test':
+        if args.clean:
 
             print("Cleaning OT...")
-            shutil.rmtree(os.path(OT_config['save_path']))
+            shutil.rmtree(os.path.join(OT_config['save_path']))
         else:
         
             print(f"Computing OT...     [{OT_config['source_country']} -> {OT_config['target_country']}]")
@@ -75,10 +76,10 @@ def main(args):
 
         eval_config = json.load(open('config/eval.json'))
 
-        if args.clean and args.exec_type != 'test':
+        if args.clean:
 
             print("Cleaning Results...")
-            shutil.rmtree(os.path(eval_config['save_path']))
+            shutil.rmtree(os.path.join(eval_config['save_path']))
         else:
         
             train_config = json.load(open('config/train.json'))
@@ -96,7 +97,7 @@ def main(args):
         
         viz_config = json.load(open('config/viz.json'))
 
-        if args.clean and args.exec_type != 'test':
+        if args.clean:
             print("Cleaning Visualizations...")
             shutil.rmtree(os.path.join(viz_config['save_path']))
         else:
